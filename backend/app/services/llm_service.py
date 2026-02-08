@@ -1,7 +1,6 @@
 from anthropic import Anthropic
-from config import Config
+from app.config import Config
 from datetime import datetime
-import json
 
 
 class LLMService:
@@ -55,37 +54,3 @@ Please regenerate the diary entry addressing this feedback."""
             text = f"**{date_str}**\n\n{text}"
 
         return text
-
-    def extract_entities(self, text: str) -> dict:
-        """
-        Extract entities (who), events (what), and emotions (how) from text.
-        Returns a structured dictionary instead of raw text.
-        """
-        system_prompt = """You are an expert at extracting key information from conversations. 
-Extract and return ONLY a valid JSON object (no markdown, no extra text) with this exact structure:
-{
-  "entities": [{"name": "string", "type": "person|place|thing", "role": "string"}],
-  "events": [{"action": "string", "time": "string", "significance": "high|medium|low"}],
-  "emotions": [{"feeling": "string", "intensity": "1-10", "trigger": "string"}]
-}"""
-
-        response = self.client.messages.create(
-            model=self.model,
-            max_tokens=self.max_tokens,
-            temperature=0.3,  # Lower temperature for structured output
-            system=system_prompt,
-            messages=[{"role": "user", "content": f"Extract information from this text:\n\n{text}"}],
-        )
-
-        # Parse the JSON response
-        try:
-            result = json.loads(response.content[0].text)
-            return result
-        except json.JSONDecodeError:
-            # Fallback if parsing fails
-            return {
-                "entities": [],
-                "events": [],
-                "emotions": [],
-                "raw_response": response.content[0].text
-            }

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-from llm_service import LLMService
-import json
+from app.services.llm_service import LLMService
 
 
 def main():
@@ -14,10 +13,9 @@ def main():
     while True:
         print("\nOptions:")
         print("1. Convert conversation to diary novel")
-        print("2. Extract entities from text")
-        print("3. Exit")
+        print("2. Exit")
 
-        choice = input("\nChoose an option (1-3): ").strip()
+        choice = input("\nChoose an option (1-2): ").strip()
 
         if choice == "1":
             print("\n📝 Enter your conversation or notes (type 'END' on a new line when done):")
@@ -37,7 +35,7 @@ def main():
                 # Refinement loop
                 while True:
                     feedback = input("\n💭 Did I capture the mood correctly? (yes/no/feedback): ").strip().lower()
-                    
+
                     if feedback in ["yes", "y"]:
                         print("✅ Great! Your diary entry is ready.")
                         break
@@ -57,28 +55,6 @@ def main():
                 print("❌ No input provided.")
 
         elif choice == "2":
-            print("\n📊 Enter text to extract entities (type 'END' on a new line when done):")
-            lines = []
-            while True:
-                line = input()
-                if line.strip().upper() == "END":
-                    break
-                lines.append(line)
-            user_input = "\n".join(lines)
-
-            if user_input.strip():
-                print("\n🔍 Extracting entities...\n")
-                result = llm.extract_entities(user_input)
-                
-                # Pretty print the JSON
-                if isinstance(result, dict) and "raw_response" not in result:
-                    print(json.dumps(result, indent=2))
-                else:
-                    print(result)
-            else:
-                print("❌ No input provided.")
-
-        elif choice == "3":
             print("\n👋 Goodbye!")
             break
 
