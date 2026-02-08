@@ -152,12 +152,7 @@ a single warm murmur.
 - [x] Refinement loop with feedback
 - [x] Web UI and CLI interfaces
 
-### 🔄 Milestone 2: Style Mimicry (PLANNED)
-- [ ] Author style selection (Murakami, Hemingway, Austen, etc.)
-- [ ] Style preferences per user
-- [ ] Contextual adaptation to genres
-
-### 🔮 Milestone 3: Memory & Consistency (IN PROGRESS)
+### 🔮 Milestone 2: Memory & Consistency (IN PROGRESS)
 - [ ] **Phase 3.1:** SQLite database for persistence
   - Save and retrieve diary entries
   - Context injection from past entries
@@ -166,6 +161,11 @@ a single warm murmur.
   - Smart context retrieval
   - Character/entity tracking
   - Timeline visualization
+
+### 🔄 Milestone 3: Style Mimicry (PLANNED)
+- [ ] Author style selection (Murakami, Hemingway, Austen, etc.)
+- [ ] Style preferences per user
+- [ ] Contextual adaptation to genres
 
 ### 🌍 Milestone 4: Global Narrator (FUTURE)
 - [ ] Multi-language support
