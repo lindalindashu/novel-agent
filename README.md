@@ -153,11 +153,11 @@ a single warm murmur.
 - [x] Web UI and CLI interfaces
 
 ### 🔮 Milestone 2: Memory & Consistency (IN PROGRESS)
-- [ ] **Phase 3.1:** SQLite database for persistence
+- [ ] **Phase 2.1:** SQLite database for persistence
   - Save and retrieve diary entries
   - Context injection from past entries
   - User preferences storage
-- [ ] **Phase 3.2:** Vector database for semantic search
+- [ ] **Phase 2.2:** Vector database for semantic search
   - Smart context retrieval
   - Character/entity tracking
   - Timeline visualization

@@ -1,8 +1,17 @@
 import React, { useState } from 'react'
 
+interface Entry {
+  id: number
+  user_id: number
+  raw_input: string
+  generated_diary: string
+  created_at: string
+  metadata: Record<string, any>
+}
+
 export default function DiaryTab() {
   const [input, setInput] = useState('')
-  const [diary, setDiary] = useState('')
+  const [currentEntry, setCurrentEntry] = useState<Entry | null>(null)
   const [loading, setLoading] = useState(false)
   const [showRefinement, setShowRefinement] = useState(false)
   const [feedback, setFeedback] = useState('')
@@ -21,13 +30,13 @@ export default function DiaryTab() {
       const response = await fetch('/api/diary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input })
+        body: JSON.stringify({ input, username: 'default' })
       })
 
       const data = await response.json()
 
       if (response.ok) {
-        setDiary(data.diary)
+        setCurrentEntry(data.entry)
         setShowRefinement(true)
         setFeedback('')
         outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
@@ -53,13 +62,13 @@ export default function DiaryTab() {
       const response = await fetch('/api/diary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input, feedback })
+        body: JSON.stringify({ input, feedback, username: 'default' })
       })
 
       const data = await response.json()
 
       if (response.ok) {
-        setDiary(data.diary)
+        setCurrentEntry(data.entry)
         setFeedback('')
       } else {
         alert('Error: ' + (data.error || 'Failed to regenerate diary'))
@@ -73,13 +82,24 @@ export default function DiaryTab() {
 
   const acceptDiary = () => {
     setShowRefinement(false)
-    alert('✓ Diary accepted! Your entry is ready.')
+    alert(`✓ Entry #${currentEntry?.id} saved to your chronicle!`)
   }
 
   const clearDiary = () => {
     setInput('')
-    setDiary('')
+    setCurrentEntry(null)
     setShowRefinement(false)
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 
   return (
@@ -92,7 +112,11 @@ export default function DiaryTab() {
           placeholder="Type your conversation, thoughts, or notes here..."
         />
         <div className="button-group">
-          <button className="btn-primary" onClick={generateDiary}>
+          <button
+            className="btn-primary"
+            onClick={generateDiary}
+            disabled={loading}
+          >
             ✨ Transform to Diary
           </button>
           <button className="btn-secondary" onClick={clearDiary}>
@@ -103,33 +127,52 @@ export default function DiaryTab() {
 
       {loading && (
         <div className="loading active">
-          <span className="spinner">⏳</span> Generating your diary...
+          <span className="spinner">⏳</span> Generating your diary entry with context...
         </div>
       )}
 
-      <div
-        ref={outputRef}
-        className={`output ${!diary ? 'empty' : ''}`}
-      >
-        {diary || 'Your diary entry will appear here...'}
-      </div>
-
-      {showRefinement && (
-        <div className="refinement">
-          <h3>🔄 Refine Your Entry</h3>
-          <textarea
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-            placeholder="What would you like to change? (e.g., 'Make it more emotional', 'Focus on the adventure aspect')"
-          />
-          <div className="button-group">
-            <button className="btn-primary" onClick={refineDiary}>
-              🔄 Regenerate
-            </button>
-            <button className="btn-secondary" onClick={acceptDiary}>
-              ✓ Accept
-            </button>
+      {currentEntry && (
+        <>
+          <div className="entry-meta">
+            <span>Entry #{currentEntry.id}</span>
+            <span>{formatDate(currentEntry.created_at)}</span>
           </div>
+
+          <div
+            ref={outputRef}
+            className="output"
+          >
+            {currentEntry.generated_diary}
+          </div>
+
+          {showRefinement && (
+            <div className="refinement">
+              <h3>🔄 Refine Your Entry</h3>
+              <textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="What would you like to change? (e.g., 'Make it more emotional', 'Focus on the adventure aspect')"
+              />
+              <div className="button-group">
+                <button
+                  className="btn-primary"
+                  onClick={refineDiary}
+                  disabled={loading}
+                >
+                  🔄 Regenerate
+                </button>
+                <button className="btn-secondary" onClick={acceptDiary}>
+                  ✓ Accept
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {!currentEntry && !loading && (
+        <div className="output empty">
+          Your diary entry will appear here...
         </div>
       )}
     </div>
